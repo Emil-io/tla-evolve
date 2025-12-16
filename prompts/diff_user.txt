@@ -1,0 +1,80 @@
+# Current Program Information
+- Fitness: {fitness_score}
+- Feature coordinates: {feature_coords}
+
+{artifacts}
+
+# Program Evolution History
+{evolution_history}
+
+# Current Program
+```{language}
+{current_program}
+```
+
+# Task
+Make PlusCal/TLA+ edits sized by Fitness and status to raise the FITNESS SCORE to 1.0 (TLC: "No error has been found").
+Edit size policy:
+- If status equals translation_error or Fitness is below 0.2, allow aggressive, semantics-aware rewrites within the EVOLVE-BLOCK.
+- If Fitness is between 0.2 and 0.8, prefer medium-sized, semantics-changing edits (add actions, refine guards, restructure control flow).
+- If Fitness is at least 0.8 but below 1.0, prefer small, targeted edits.
+
+# Constraints
+- Do NOT change module header, EXTENDS, CONSTANT(S), `Init`, `Next`, `Spec`, fairness or any property/invariant names or definitions used by the `.cfg`.
+- Do NOT rename identifiers referenced by properties or the model config.
+- Preserve existing indentation, labels, and whitespace.
+- NEVER produce empty or idle programs. Do NOT use `skip;` placeholders or infinite stuttering loops; implement meaningful, state-changing steps that realize the intended behavior.
+- It is forbidden to add a dummy program (placeholder/no-op). Do not return empty modules, trivial skeletons, or `skip`-only behavior.
+
+# Strategy based on Fitness and status
+1) If status equals translation_error:
+   - Focus solely on fixing PlusCal syntax and structure so translation succeeds.
+   - You may fully replace the algorithm contents within the EVOLVE-BLOCK.
+   - Ensure variable declarations align with the module; use correct labels, semicolons, and control-flow syntax.
+2) Else if TLC found property violations, deadlock, or other runtime errors:
+   - Use violated_properties or error hints to adjust guards, actions, and control flow.
+   - Choose edit size based on Fitness thresholds above.
+3) Else if status is ok but Fitness is below 1.0:
+   - Apply targeted changes to reach full correctness without weakening properties.
+
+# CRITICAL: C-Style PlusCal Syntax
+
+This uses C-style PlusCal. NEVER mix with Pascal style.
+
+## Quick Reference
+- Use SINGLE curly braces (not double!) for C-style blocks
+- `if (condition) OPEN_BRACE ... CLOSE_BRACE else OPEN_BRACE ... CLOSE_BRACE;` ← CORRECT
+- `if condition then ... end if;` ← WRONG (Pascal style)
+- `while (condition) OPEN_BRACE ... CLOSE_BRACE;` ← CORRECT
+- Every procedure body starts with a label
+- Every statement after `call`/`return`/`goto` needs a label
+
+## Error-Specific Fixes
+
+**"Expected '(' but found 'X'"** → Add parentheses around condition:
+  - Change: `if boat = "left" then` → `if (boat = "left") OPEN_BRACE`
+
+**"Expected ':=' but found 'if'" or "end if"** → You're mixing styles:
+  - Replace `then`/`end if` with curly braces
+
+**"Empty statement list"** → Procedure body is empty:
+  - Add a labeled, meaningful statement that advances the algorithm (e.g., update state, send/receive, or call a procedure). Do NOT use `skip;`.
+
+**"Missing label"** → Statement after call/return/goto needs label:
+  - Add `labelN:` before the statement
+
+**"Deadlock reached"** → Algorithm terminated with no enabled actions:
+  - Identify why no actions are enabled and introduce or adjust steps so the algorithm makes progress until a legitimate termination condition. Do NOT add infinite stuttering or `skip;`-only loops.
+
+# Provide changes in EXACT SEARCH/REPLACE diff format
+
+<<<<<<< SEARCH
+# Original code to find and replace (must match exactly)
+=======
+# New replacement code
+>>>>>>> REPLACE
+
+You may include multiple SEARCH/REPLACE blocks. Each SEARCH must match exactly.
+Important: Restrict changes strictly to the EVOLVE-BLOCK region.
+Important: For low Fitness or translation errors you may replace the entire EVOLVE-BLOCK content; otherwise keep changes localized.
+Important: Use SINGLE curly braces for PlusCal C-style syntax, NOT double braces!

@@ -1,0 +1,50 @@
+# Current Program Information
+- Fitness: {fitness_score}
+- Feature coordinates: {feature_coords}
+
+{artifacts}
+
+# Program Evolution History
+{evolution_history}
+
+# Current Program
+```{language}
+{current_program}
+```
+
+# Task
+Provide a complete PlusCal/TLA+ rewrite of the algorithm that achieves FITNESS SCORE 1.0 (TLC: "No error has been found").
+
+- The system maintains diversity across these dimensions: {feature_dimensions}
+- If a minimal diff cannot resolve the issues, produce a clean, correct rewrite.
+
+# Hard constraints
+- Keep module header, EXTENDS, CONSTANT(S), `Init`, `Next`, `Spec`, fairness and all property/invariant names and definitions unchanged.
+- Keep identifiers referenced by the `.cfg` unchanged.
+- Maintain the same variables and observable behavior required by properties.
+- It is forbidden to add a dummy program (placeholder/no-op). Do not return empty modules, trivial skeletons, or `skip`-only behavior.
+
+Non-dummy behavior requirements
+- The algorithm must include enabled actions that cause observable state changes relevant to the properties.
+- Do not satisfy liveness by disabling progress conditions or making enabling conditions permanently false.
+- Avoid programs that terminate immediately without exercising the intended behavior space.
+- If the model includes communication or message passing, ensure there are reachable executions where items are added to and removed from those structures.
+- Infinite loops must not be pure stuttering or `skip`-only; they must evolve state meaningfully.
+
+# Guidance
+- Follow status and Fitness driven editing:
+  - If status equals translation_error, focus on fixing PlusCal syntax and structure so translation succeeds; you may completely replace the algorithm within the EVOLVE-BLOCK.
+  - If Fitness is below 0.2, treat the current algorithm as expendable scaffolding and perform a semantics-aware rewrite that realizes the intended behavior while keeping the interface consistent.
+  - If Fitness is between 0.2 and 0.8, make medium-sized, semantics-changing edits (add actions, refine guards, restructure control flow).
+  - If Fitness is at least 0.8 but below 1.0, prefer small, targeted improvements to reach full correctness.
+- Ensure PlusCal translates, then satisfy all invariants/properties and avoid deadlock without weakening properties.
+- Use clear labels and atomic steps; maintain frames so untouched variables remain unchanged.
+- Prefer simple, obviously-correct steps over clever ones.
+- Never produce empty or idle algorithms; avoid `skip;` placeholders or infinite stuttering loops. Implement meaningful, state-changing steps that realize the intended behavior.
+
+# Output
+Return ONLY the full TLA+ module text (including the PlusCal algorithm block) between code fences:
+
+```{language}
+\* Your rewritten program here
+```
