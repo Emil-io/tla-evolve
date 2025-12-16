@@ -14,8 +14,7 @@ Built on top of `openevolve`, it combines island-based search and checkpointing 
 1. Seed: Provide a TLA+/PlusCal program and an evaluator that runs TLC with your `.cfg`.
 2. Propose: The LLM suggests edits (diff-based by default).
 3. Judge: The evaluator executes TLC, parses results, and returns `combined_score` plus artifacts.
-4. Select + diversify: The search maintains diverse, high-scoring solutions and periodically migrates between islands.
-5. Stop when done: Early-stop on reaching a target score or after N iterations; artifacts are saved.
+4. Stop when done: Early-stop on reaching a target score or after N iterations; artifacts are saved.
 
 ### Prompts (fine-grained, file-based)
 
